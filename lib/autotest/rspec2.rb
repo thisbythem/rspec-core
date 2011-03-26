@@ -41,8 +41,13 @@ class Autotest::Rspec2 < Autotest
   end
 
   def make_test_cmd(files_to_test)
-    files_to_test.empty? ? '' :
+    if files_to_test.empty?
+      ''
+    elsif options[:parallel] and files_to_test.size > 1
+      "#{prefix}parallel_spec #{normalize(files_to_test).keys.flatten.join(' ')}"
+    else
       "#{prefix}#{ruby}#{suffix} -S #{SPEC_PROGRAM} --tty #{normalize(files_to_test).keys.flatten.map { |f| "'#{f}'"}.join(' ')}"
+    end
   end
 
   def normalize(files_to_test)

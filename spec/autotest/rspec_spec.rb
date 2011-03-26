@@ -55,6 +55,27 @@ describe Autotest::Rspec2 do
       cmd.should match(' --tty ')
       cmd.should_not match(' --autotest ')
     end
+
+    context "when parallel option is set to true" do
+      before do
+        rspec_autotest.options[:parallel] = true
+      end
+
+      after do
+        rspec_autotest.options[:parallel] = false
+      end
+
+      it "makes the appropriate test command" do
+        actual_command = rspec_autotest.make_test_cmd(@files_to_test)
+        expected_command = /parallel_spec (.*)/
+
+        actual_command.should match(expected_command)
+
+        actual_command =~ expected_command
+        $1.should =~ /#{File.expand_path('file_one')}/
+        $1.should =~ /#{File.expand_path('file_two')}/
+      end
+    end
   end
 
   describe "mappings" do
